@@ -27,3 +27,35 @@ function animate() {
 
     renderer.render(scene, camera);
 }
+
+// -----------------------------------------------------------------------------
+
+// Resize handling
+// How can scene scale be preserved on resize? - https://threejs.org/manual/#en/faq
+// https://jsfiddle.net/Q4Jpu/
+
+// remember these initial values
+var tanFOV = Math.tan(((Math.PI / 180) * camera.fov / 2));
+var windowHeight = window.innerHeight;
+
+// Event Listeners
+window.addEventListener('resize', onWindowResize, false);
+
+function onWindowResize(_: UIEvent) {
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+
+    // adjust the FOV
+    camera.fov = (360 / Math.PI) * Math.atan(tanFOV * (window.innerHeight / windowHeight));
+
+    camera.updateProjectionMatrix();
+    camera.lookAt(scene.position);
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.render(scene, camera);
+}
+
+// ---
+
+// prevent unwanted white flashes during resize
+document.body.style.backgroundColor = "black"
