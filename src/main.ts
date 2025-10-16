@@ -9,7 +9,7 @@ const cameraFarClippingPlane = 1000;
 const camera = new THREE.PerspectiveCamera(cameraFOV, cameraAspectRatio, cameraNearClippingPlane, cameraFarClippingPlane);
 
 const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(window.innerWidth, window.innerHeight); // TODO : this can refactor to reuse the resize logic below for initialization
 renderer.setAnimationLoop(animate);
 
 document.body.appendChild(renderer.domElement);
@@ -58,7 +58,17 @@ function onWindowResize(_: UIEvent) {
     camera.updateProjectionMatrix();
     camera.lookAt(scene.position);
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    // a canvas internal size, its resolution, often called its drawingbuffer size
+    // renderer.setSize(window.innerWidth, window.innerHeight); // by default this sets the canvas's CSS size as well
+    // renderer.setSize(window.innerWidth, window.innerHeight, false); // pass false to use CSS to determine the display size of the element
+
+    // this handles HD-DPI displays (high-density dot per inch displays)
+    // renders more pixels at the expense of compute (lower performance)
+    const pixelRatio = window.devicePixelRatio;
+    const width = Math.floor(window.innerWidth * pixelRatio);
+    const height = Math.floor(window.innerHeight * pixelRatio);
+    renderer.setSize(width, height);
+
     renderer.render(scene, camera);
 }
 
